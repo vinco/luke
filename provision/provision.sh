@@ -4,7 +4,7 @@ apt-get update
 
 
 echo "Installing base packages..."
-PACKAGES="build-essential zsh git vim-nox tree htop libjpeg-dev libfreetype6-dev graphviz"
+PACKAGES="build-essential zsh git vim-nox tree htop libjpeg-dev libfreetype6-dev graphviz gettext"
 PACKAGES="$PACKAGES python python-setuptools python-pip python-dev"
 PACKAGES="$PACKAGES postgresql-9.3 postgresql-server-dev-9.3"
 
