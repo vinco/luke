@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 from fabric.api import cd, env, require, run, task
+from fabric.colors import green, white
 from fabric.context_managers import contextmanager, shell_env
+from fabric.utils import puts
 
 from fabutils import arguments, join, options
-from fabutils.tasks import ulocal, urun
 from fabutils.env import set_env_from_json_file
+from fabutils.context import cmd_msg
+from fabutils.tasks import ulocal, urun, ursync_project
+from fabutils.text import SUCCESS_ART
 
 
 @contextmanager
@@ -62,6 +66,15 @@ def bootstrap():
 
 
 @task
+def loaddata(*args):
+    """
+    Loads the given data fixtures into the project's database.
+    """
+    with virtualenv():
+        run(join('python manage.py loaddata', arguments(*args)))
+
+
+@task
 def makemigrations(*args, **kwargs):
     """
     Creates the new migrations based on the project's models changes.
@@ -109,65 +122,80 @@ def deploy(git_ref, upgrade=False):
     """
     require('hosts', 'user', 'group', 'site_dir', 'django_settings')
 
-    # Put the environment in maintenance mode
-    # maintenance('on', False)
-
     # Retrives git reference metadata and creates a temp directory with the
     # contents resulting of applying a ``git archive`` command.
-    print white('Creating git archive from {0}...'.format(git_ref), bold=True)
-    repo = ulocal('basename `git rev-parse --show-toplevel`', capture=True)
-    commit = ulocal('git rev-parse --short {0}'.format(git_ref), capture=True)
+    message = white('Creating git archive from {0}'.format(git_ref), bold=True)
+    with cmd_msg(message):
+        repo = ulocal(
+            'basename `git rev-parse --show-toplevel`', capture=True)
+        commit = ulocal(
+            'git rev-parse --short {0}'.format(git_ref), capture=True)
+        branch = ulocal(
+            'git rev-parse --abbrev-ref HEAD', capture=True)
 
-    revision = ulocal('git rev-parse HEAD', capture=True)
-    branch = ulocal('git rev-parse --abbrev-ref HEAD', capture=True)
+        tmp_dir = '/tmp/blob-{0}-{1}/'.format(repo, commit)
 
-    tmp_dir = '/tmp/blob-{0}-{1}/'.format(repo, commit)
-
-    ulocal('rm -fr {0}'.format(tmp_dir))
-    ulocal('mkdir {0}'.format(tmp_dir))
-    ulocal('git archive {0} ./src | tar -xC {1} --strip 1'.format(
-        commit, tmp_dir))
+        ulocal('rm -fr {0}'.format(tmp_dir))
+        ulocal('mkdir {0}'.format(tmp_dir))
+        ulocal('git archive {0} ./src | tar -xC {1} --strip 1'.format(
+            commit, tmp_dir))
 
     # Uploads the code of the temp directory to the host with rsync telling
     # that it must delete old files in the server, upload deltas by checking
     # file checksums recursivelly in a zipped way; changing the file
     # permissions to allow read, write and execution to the owner, read and
     # execution to the group and no permissions for any other user.
-    print white('Uploading code to server...', bold=True)
-    ursync_project(
-        local_dir=tmp_dir,
-        remote_dir=env.site_dir,
-        delete=True,
-        default_opts='-chrtvzP',
-        extra_opts='--chmod=750',
-        exclude=["*.pyc", "env/", "cover/"]
-    )
+    with cmd_msg(white('Uploading code to server...', bold=True)):
+        ursync_project(
+            local_dir=tmp_dir,
+            remote_dir=env.site_dir,
+            delete=True,
+            default_opts='-chrtvzP',
+            extra_opts='--chmod=750',
+            exclude=["*.pyc", "env/", "cover/"]
+        )
 
     # Performs the deployment task, i.e. Install/upgrade project
     # requirements, syncronize and migrate the database changes, collect
     # static files, reload the webserver, etc.
-    print white('Running deployment tasks...', bold=True)
-    with virtualenv():
-        run('pip install -{0}r ./requirements/production.txt'.format(
-            'U' if upgrade else ''))
-        run('python manage.py migrate --noinput')
-        run('python manage.py collectstatic --noinput')
-        run('chgrp -R {0} .'.format(env.group))
-        run('chgrp -R {0} ../media'.format(env.group))
-        run('touch ../reload')
+    message = white('Running deployment tasks', bold=True)
+    with cmd_msg(message, grouped=True):
+        with virtualenv():
 
-        register_deployment(commit, branch)
+            message = white('Installing Python requirements with pip')
+            with cmd_msg(message, spaces=2):
+                run('pip install -{0}r ./requirements/production.txt'.format(
+                    'U' if upgrade else ''))
+
+            message = white('Migrating database')
+            with cmd_msg(message, spaces=2):
+                run('python manage.py migrate --noinput')
+
+            message = white('Collecting static files')
+            with cmd_msg(message, spaces=2):
+                run('python manage.py collectstatic --noinput')
+
+            message = white('Setting file permissions')
+            with cmd_msg(message, spaces=2):
+                run('chgrp -R {0} .'.format(env.group))
+                run('chgrp -R {0} ../media'.format(env.group))
+
+            message = white('Restarting webserver')
+            with cmd_msg(message, spaces=2):
+                run('touch ../reload')
+
+            message = white('Registering deployment')
+            with cmd_msg(message, spaces=2):
+                register_deployment(commit, branch)
 
     # Clean the temporary snapshot files that was just deployed to the host
-    print white('Cleaning up...', bold=True)
-    ulocal('rm -fr {0}'.format(tmp_dir))
+    message = white('Cleaning up...', bold=True)
+    with cmd_msg(message):
+        ulocal('rm -fr {0}'.format(tmp_dir))
 
-    # Take off the environment from maintenance mode
-    # maintenance('off', False)
-
-    print green(SUCCESS_ART)
-    print white('Code from {0} was succesfully deployed to host {1}'.format(
-        git_ref, ', '.join(env.hosts)), bold=True)
+    puts(green(SUCCESS_ART), show_prefix=False)
+    puts(white('Code from {0} was succesfully deployed to host {1}'.format(
+        git_ref, ', '.join(env.hosts)), bold=True), show_prefix=False)
 
 
 @task
@@ -175,8 +203,6 @@ def register_deployment(commit, branch):
     """
     Register the current deployment at Opbeat with given commit and branch.
     """
-
-    print white('Registering opbeat deployment..', bold=True)
     with virtualenv():
         run(
             'opbeat -o $OPBEAT_ORGANIZATION_ID '
