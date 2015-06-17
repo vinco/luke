@@ -5,7 +5,7 @@
         "site_dir": "/home/vagrant/src/",
         "django_settings": "luke.settings.devel",
         "command_prefixes": [
-            "../env/bin/activate"
+            "/home/vagrant/env/bin/activate"
         ]
     }
 }
