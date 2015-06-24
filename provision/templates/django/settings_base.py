@@ -53,7 +53,7 @@ WSGI_APPLICATION = '${PROJECT_NAME}.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -62,7 +62,7 @@ DATABASES = {
 }
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.7/topics/i18n/
+# https://docs.djangoproject.com/en/1.8/topics/i18n/
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -75,7 +75,7 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
+# https://docs.djangoproject.com/en/1.8/howto/static-files/
 STATIC_URL = '/assets/'
 
 STATICFILES_DIRS = (
@@ -88,7 +88,7 @@ STATIC_ROOT = os.path.realpath(
 
 
 # Template directories
-# See https://docs.djangoproject.com/en/1.7/ref/settings/#template-dirs
+# See https://docs.djangoproject.com/en/1.8/ref/settings/#template-dirs
 TEMPLATE_DIRS = (
     os.path.realpath(os.path.join(BASE_DIR, '..', 'templates')),
 )
