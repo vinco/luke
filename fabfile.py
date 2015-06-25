@@ -211,3 +211,15 @@ def register_deployment(commit, branch):
             '--component path:. vcs:git rev:%s branch:%s '
             % (commit, branch)
         )
+
+@task
+def startapp(app_name):
+    """
+    Create a new app inside the Django project
+
+    Usage:
+
+    >>> fab environment:vagrant start_app:'app_name'
+    """
+    with virtualenv():
+        run(join('python manage.py startapp', app_name))
