@@ -223,3 +223,22 @@ def startapp(app_name):
     """
     with virtualenv():
         run(join('python manage.py startapp', app_name))
+
+@task
+def inspectdb(filename=""):
+    """
+    Allows the inspection of legacy databases inside Django projects
+
+    Usage:
+
+    >>> fab environment:vagrant inspectdb
+    Print the models needed to work with the database
+
+    >>> fab environment:vagrant inspectdb:'filename'
+    Use 'filename' as the output file
+    """
+    with virtualenv():
+        if(filename == ""):
+            run('python manage.py inspectdb')
+        else:
+            run(join('python manage.py inspectdb > ', filename))
