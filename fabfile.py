@@ -242,3 +242,14 @@ def inspectdb(filename=""):
             run('python manage.py inspectdb')
         else:
             run(join('python manage.py inspectdb > ', filename))
+
+@task 
+def createsuperuser():
+    """
+    Create a superuser to use in the Django application
+
+    Usage:
+
+    >>> fab environment:vagrant createsuperuser
+    """
+    run('python manage.py createsuperuser')
