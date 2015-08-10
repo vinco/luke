@@ -37,6 +37,25 @@ def environment(env_name):
 
 
 @task
+def startapp(app_name):
+    """
+    Starts a new app
+    """
+    if app_name:
+        with virtualenv():
+            run('python manage.py startapp {0}'.format(app_name))
+
+
+@task
+def createsuperuser():
+    """
+    Starts a new app
+    """
+    with virtualenv():
+        run('python manage.py createsuperuser')
+
+
+@task
 def createdb():
     """
     Creates a new database instance with utf-8 encoding for the project.
