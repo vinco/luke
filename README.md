@@ -53,10 +53,26 @@ Simple scripts and templates for scaffolding a basic Django project
 
     ```bash
     $ vagrant up
+    ```
+4. Redirect the required domains to your localhost
+    ```bash
+    # /etc/hosts
+    192.168.33.2  http://luke.local/
+    ```
+
+5. Build the environment inside the virtual machine
+    
+    ```bash
     $ fab environment:vagrant bootstrap
     ```
 
-4. Init your repository
+6. Run the development server
+    
+    ```bash
+    $ fab environment:vagrant runserver
+    ```
+
+7. Init your repository
 
     ```bash
     $ git init
