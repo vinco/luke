@@ -7,6 +7,7 @@ echo "Installing base packages..."
 PACKAGES="build-essential zsh git vim-nox tree htop libjpeg-dev libfreetype6-dev graphviz gettext"
 PACKAGES="$PACKAGES python python-setuptools python-pip python-dev"
 PACKAGES="$PACKAGES postgresql-9.3 postgresql-server-dev-9.3"
+PACKAGES="$PACKAGES nginx"
 
 apt-get install -y $PACKAGES
 
@@ -20,6 +21,12 @@ USER_EXISTS=$(psql -U postgres -h localhost -tAc "SELECT 1 FROM pg_roles WHERE r
 if [ ! $USER_EXISTS ]; then
     sudo -Hu postgres bash -c 'createuser -dSR vagrant'
 fi
+
+echo "Setting up reverse proxy with Nginx..."
+unlink /etc/nginx/sites-enabled/default
+cp /tmp/templates/nginx/local.conf /etc/nginx/sites-available/
+ln -s /etc/nginx/sites-available/local.conf /etc/nginx/sites-enabled/
+service nginx restart
 
 
 echo "Installing Oh My Zsh!..."
@@ -49,7 +56,7 @@ fi
 
 
 echo "Installing python dependencies..."
-REQUIREMENTS_FILE=/home/vagrant/src/requirements/devel.txt
+REQUIREMENTS_FILE=/home/vagrant/src/requirements/local.txt
 
 if [ -f "$REQUIREMENTS_FILE" ]; then
     sudo -Hu vagrant bash -c "source $VIRTUALENV_DIR/bin/activate && pip install -r $REQUIREMENTS_FILE"
@@ -66,7 +73,7 @@ if [ ! -d  "$PROJECT_DIR" ]; then
     mkdir $PROJECT_DIR/settings
     rm $PROJECT_DIR/settings.py
     echo "$(envsubst < /tmp/templates/django/settings_base.py)" > $PROJECT_DIR/settings/__init__.py
-    echo "$(envsubst < /tmp/templates/django/settings_devel.py)" > $PROJECT_DIR/settings/devel.py
+    echo "$(envsubst < /tmp/templates/django/settings_local.py)" > $PROJECT_DIR/settings/local.py
     chown -R vagrant:vagrant $PROJECT_DIR/..
 fi
 
