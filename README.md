@@ -16,7 +16,7 @@ Simple scripts and templates for scaffolding a basic Django project
     ```bash
     $ mkdir myproject
     $ cd myproject
-    $ wget https://github.com/gGonz/luke/archive/master.tar.gz -O - | tar -xz --strip 1
+    $ wget https://github.com/vinco/luke/archive/master.tar.gz -O - | tar -xz --strip 1
     ```
 
 2. Set your project's name in `evironments.json`, `fabfile.py` and `provision/provision.sh`
