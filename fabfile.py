@@ -13,7 +13,8 @@ from fabutils.text import SUCCESS_ART
 
 @contextmanager
 def virtualenv():
-    """
+    """Activate virtualenv.
+
     Activates the virtualenv in which the commands shall be run.
     """
     require('site_dir', 'django_settings')
@@ -25,9 +26,13 @@ def virtualenv():
 
 @task
 def environment(env_name):
-    """
+    """Creates environment.
+
     Creates a dynamic environment based on the contents of the given
     environments_file.
+
+    Args:
+        env_name(str): Name environment.
     """
     if env_name == 'vagrant':
         result = ulocal('vagrant ssh-config | grep IdentityFile', capture=True)
@@ -38,16 +43,24 @@ def environment(env_name):
 
 @task
 def createdb():
-    """
+    """New database.
+
     Creates a new database instance with utf-8 encoding for the project.
+
+    Usage:
+        >>>fab environment:vagrant createdb.
     """
     urun('createdb luke -l en_US.UTF-8 -E UTF8 -T template0')
 
 
 @task
 def resetdb():
-    """
+    """Restore database.
+
     Reset the project's database by dropping an creating it again.
+
+    Usage:
+        >>>fab environment:vagrant resetdb.
     """
     urun('dropdb luke')
     createdb()
@@ -56,8 +69,12 @@ def resetdb():
 
 @task
 def bootstrap():
-    """
-    Builds the environment to start the project.
+    """Builds the environment to start the project.
+
+    Create database, apply migrations and collect the static files.
+
+    Usage:
+        >>>fab environment:vagrant bootstrap.
     """
     # Build the DB schema and collect the static files.
     createdb()
@@ -67,8 +84,13 @@ def bootstrap():
 
 @task
 def loaddata(*args):
-    """
-    Loads the given data fixtures into the project's database.
+    """Loads the given data fixtures into the project's database.
+
+    Args:
+        args(str): Name fixture.
+
+    Usage:
+        >>>fab environment:vagrant loaddata:'fixture'.
     """
     with virtualenv():
         run(join('python manage.py loaddata', arguments(*args)))
@@ -76,8 +98,15 @@ def loaddata(*args):
 
 @task
 def makemigrations(*args, **kwargs):
-    """
-    Creates the new migrations based on the project's models changes.
+    """Creates the new migrations based on the project's models changes.
+
+    Creating new migrations based on the changes you have made to your models.
+
+    Args:
+        args (Optional[str]): Create migration for app_name.
+
+    Example:
+        fab environment:vagrant makemigrations.
     """
     with virtualenv():
         run(join('python manage.py makemigrations',
@@ -86,8 +115,17 @@ def makemigrations(*args, **kwargs):
 
 @task
 def migrate(*args, **kwargs):
-    """
+    """Apply migrations.
+
     Syncs the DB and applies the available migrations.
+
+    Args:
+        args (Optional[str]): Specified apps has its migrations.
+        kwargs (Optional[str]): Brings the database schema to state where the
+                                named migration is applied (migrate_name).
+
+    Example:
+        >>>fab environment:vagrant migrate.
     """
     with virtualenv():
         run(join('python manage.py migrate',
@@ -96,8 +134,10 @@ def migrate(*args, **kwargs):
 
 @task
 def collectstatic():
-    """
-    Collects the static files.
+    """Collects the static files.
+
+    Usage:
+        >>> fab environment:vagrant collectstatic.
     """
     with virtualenv():
         run('python manage.py collectstatic --noinput')
@@ -105,8 +145,12 @@ def collectstatic():
 
 @task
 def runserver():
-    """
+    """Run project.
+
     Starts the development server inside the Vagrant VM.
+
+    Usage:
+        >>>fab environment:vagrant runserver.
     """
     with virtualenv():
         run('python manage.py runserver_plus 0.0.0.0:8000')
@@ -114,11 +158,19 @@ def runserver():
 
 @task
 def deploy(git_ref, upgrade=False):
-    """
+    """Deploy project.
+
     Deploy the code of the given git reference to the previously selected
     environment.
-    Pass ``upgrade=True`` to upgrade the versions of the already installed
-    project requirements (with pip).
+
+    Args:
+        upgrade(Optional[bool]):
+            Pass ``upgrade=True`` to upgrade the versions of the already
+            installed project requirements (with pip)
+        git_ref(str): name branch you make deploy.
+
+    Example:
+        >>>fab environment:vagrant deploy:devel.
     """
     require('hosts', 'user', 'group', 'site_dir', 'django_settings')
 
@@ -200,8 +252,13 @@ def deploy(git_ref, upgrade=False):
 
 @task
 def register_deployment(commit, branch):
-    """
+    """Register deployment.
+
     Register the current deployment at Opbeat with given commit and branch.
+
+    Args:
+        commit(str): This is last commit project.
+        branch(str): Name branch.
     """
     with virtualenv():
         run(
@@ -212,30 +269,38 @@ def register_deployment(commit, branch):
             % (commit, branch)
         )
 
+
 @task
 def startapp(app_name):
-    """
-    Create a new app inside the Django project
+    """Create new app
+
+    Create a new app inside the Django project.
+
+    Args:
+        app_name(str): Name of new app inside project.
 
     Usage:
-
-    >>> fab environment:vagrant start_app:'app_name'
+        >>> fab environment:vagrant start_app:'app_name'.
     """
     with virtualenv():
         run(join('python manage.py startapp', app_name))
 
+
 @task
 def inspectdb(filename=""):
-    """
-    Allows the inspection of legacy databases inside Django projects
+    """Inspection database.
+
+    Allows the inspection of legacy databases inside Django projects.
+
+    Args:
+        filename(str): Name output file.
 
     Usage:
+        >>> fab environment:vagrant inspectdb
+        Print the models needed to work with the database
 
-    >>> fab environment:vagrant inspectdb
-    Print the models needed to work with the database
-
-    >>> fab environment:vagrant inspectdb:'filename'
-    Use 'filename' as the output file
+        >>> fab environment:vagrant inspectdb:'filename'
+        Use 'filename' as the output file.
     """
     with virtualenv():
         if(filename == ""):
@@ -243,13 +308,14 @@ def inspectdb(filename=""):
         else:
             run(join('python manage.py inspectdb > ', filename))
 
-@task 
+
+@task
 def createsuperuser():
-    """
-    Create a superuser to use in the Django application
+    """Create superuser.
+
+    Create a superuser to use in the Django application.
 
     Usage:
-
-    >>> fab environment:vagrant createsuperuser
+        >>> fab environment:vagrant createsuperuser.
     """
     run('python manage.py createsuperuser')
