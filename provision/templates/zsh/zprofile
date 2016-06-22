@@ -5,4 +5,4 @@ source /home/vagrant/env/bin/activate
 cd /home/vagrant/src
 
 # Automatically load the proper Django settings
-export DJANGO_SETTINGS_MODULE=luke.settings.local
+export DJANGO_SETTINGS_MODULE=${PROJECT_NAME}.settings.local

@@ -2,13 +2,13 @@
 """
 Django development settings for ${PROJECT_NAME} project.
 """
-from . import *
+from . import * # noqa
 
 
 # Debug
 DEBUG = True
 
-TEMPLATE_DEBUG = DEBUG
+TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
 
 
 # Application definition
