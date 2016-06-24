@@ -30,14 +30,17 @@ service nginx restart
 
 
 echo "Installing Oh My Zsh!..."
+PROJECT_NAME=luke
 OHMYZSH_DIR=/home/vagrant/.oh-my-zsh
 
 if [ ! -d $OHMYZSH_DIR ]; then
     sudo -Hu vagrant bash -c "git clone https://github.com/robbyrussell/oh-my-zsh.git $OHMYZSH_DIR"
 fi
 
+export PROJECT_NAME
+echo "$(envsubst < /tmp/templates/zsh/zprofile)" > /home/vagrant/.zprofile
 cp /tmp/templates/zsh/zshrc /home/vagrant/.zshrc
-cp /tmp/templates/zsh/zprofile /home/vagrant/.zprofile
+
 chown vagrant:vagrant /home/vagrant/.zshrc
 chown vagrant:vagrant /home/vagrant/.zprofile
 chsh -s $(which zsh) vagrant
@@ -64,7 +67,6 @@ fi
 
 
 echo "Creating Django project..."
-PROJECT_NAME=luke
 PROJECT_DIR=/home/vagrant/src/$PROJECT_NAME
 
 if [ ! -d  "$PROJECT_DIR" ]; then

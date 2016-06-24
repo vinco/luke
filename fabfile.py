@@ -5,9 +5,9 @@ from fabric.context_managers import contextmanager, shell_env
 from fabric.utils import puts
 
 from fabutils import arguments, join, options
-from fabutils.env import set_env_from_json_file
 from fabutils.context import cmd_msg
-from fabutils.tasks import ulocal, urun, ursync_project
+from fabutils.env import set_env_from_json_file
+from fabutils.tasks import ulocal, ursync_project, urun
 from fabutils.text import SUCCESS_ART
 
 
