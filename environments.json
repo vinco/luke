@@ -1,9 +1,9 @@
 {
     "vagrant": {
         "user": "vagrant",
-        "hosts": ["127.0.0.1:2222"],
+        "hosts": ["192.168.33.2"],
         "site_dir": "/home/vagrant/src/",
-        "django_settings": "luke.settings.devel",
+        "django_settings": "luke.settings.local",
         "command_prefixes": [
             "/home/vagrant/env/bin/activate"
         ]

@@ -3,3 +3,6 @@ source /home/vagrant/env/bin/activate
 
 # Go to src directory actumatically
 cd /home/vagrant/src
+
+# Automatically load the proper Django settings
+export DJANGO_SETTINGS_MODULE=${PROJECT_NAME}.settings.local
