@@ -43,21 +43,30 @@ def environment(env_name):
 
 @task
 def startapp(app_name):
+    """Create new app
+
+    Create a new app inside the Django project.
+
+    Args:
+        app_name(str): Name of new app inside project.
+
+    Usage:
+        >>> fab environment:vagrant start_app:'app_name'.
     """
-    Starts a new app
-    """
-    if app_name:
-        with virtualenv():
-            run('python manage.py startapp {0}'.format(app_name))
+    with virtualenv():
+        run(join('python manage.py startapp', app_name))
 
 
 @task
 def createsuperuser():
+    """Create superuser.
+
+    Create a superuser to use in the Django application.
+
+    Usage:
+        >>> fab environment:vagrant createsuperuser.
     """
-    Starts a new app
-    """
-    with virtualenv():
-        run('python manage.py createsuperuser')
+    run('python manage.py createsuperuser')
 
 
 @task
@@ -290,22 +299,6 @@ def register_deployment(commit, branch):
 
 
 @task
-def startapp(app_name):
-    """Create new app
-
-    Create a new app inside the Django project.
-
-    Args:
-        app_name(str): Name of new app inside project.
-
-    Usage:
-        >>> fab environment:vagrant start_app:'app_name'.
-    """
-    with virtualenv():
-        run(join('python manage.py startapp', app_name))
-
-
-@task
 def inspectdb(filename=""):
     """Inspection database.
 
@@ -326,15 +319,3 @@ def inspectdb(filename=""):
             run('python manage.py inspectdb')
         else:
             run(join('python manage.py inspectdb > ', filename))
-
-
-@task
-def createsuperuser():
-    """Create superuser.
-
-    Create a superuser to use in the Django application.
-
-    Usage:
-        >>> fab environment:vagrant createsuperuser.
-    """
-    run('python manage.py createsuperuser')
