@@ -76,6 +76,7 @@ if [ ! -d  "$PROJECT_DIR" ]; then
     rm $PROJECT_DIR/settings.py
     echo "$(envsubst < /tmp/templates/django/settings_base.py)" > $PROJECT_DIR/settings/__init__.py
     echo "$(envsubst < /tmp/templates/django/settings_local.py)" > $PROJECT_DIR/settings/local.py
+    cp -r /tmp/templates/django/core $PROJECT_DIR
     chown -R vagrant:vagrant $PROJECT_DIR/..
 fi
 
