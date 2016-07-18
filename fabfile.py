@@ -205,9 +205,14 @@ def register_deployment(commit, branch):
     """
     with virtualenv():
         run(
-            'opbeat -o $OPBEAT_ORGANIZATION_ID '
-            '-a $OPBEAT_APP_ID '
-            '-t $OPBEAT_SECRET_TOKEN deployment '
-            '--component path:. vcs:git rev:%s branch:%s '
-            % (commit, branch)
+            'curl https://intake.opbeat.com/api/v1/'
+            'organizations/$OPBEAT_ORGANIZATION_ID/'
+            'apps/$OPBEAT_APP_ID/releases/ \
+            -H "Authorization: Bearer $OPBEAT_SECRET_TOKEN" \
+            -d rev={commit} \
+            -d branch={branch} \
+            -d status=completed'
+            .format(
+                commit=commit, branch=branch
+            )
         )
