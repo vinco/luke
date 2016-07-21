@@ -347,3 +347,61 @@ router.register_nested(
 #
 
 ```
+
+* Also is possible define detail routes.
+```python
+# luke/application/api.py or luke/application/viewsets.py
+# -*- coding: utf-8 -*-
+
+from luke.api.v1.routers import router
+from luke.application import serializers
+from luke.application.permissions import IsAdminOrIsSelf
+from luke.core.api import viewsets
+
+class TodoViewSet(viewsets.GenericViewSet):
+
+    serializer_class = serializers.CustomSerializer
+    #
+    # Define the serializer of your custom detail_route. The name should be
+    # name_of_action_serializer_class.
+    #
+    custom_action_serializer_class = serializers.CustomSerializer
+    
+    #
+    # You can do custom your detail route. For example, you can define the HHTP
+    # method, also, the permission_classes can be defined right here. Finally,
+    # if you need that the URL will be different to method name, just you
+    # define it in the parameter url_path
+    #
+    @detail_route(
+        methods=['PUT'],
+        permission_classes=[IsAdminOrIsSelf],
+        url_path='custom-action'
+    )
+    def custom_action(self, request, *args, **kwars):
+
+        # Serializer that will be used to validate the information.
+        update_serializer = self.get_serializer(
+            request.user,
+            data=request.data,
+            partial=True,
+            action='custom_action'
+        )
+
+        update_serializer.is_valid(raise_exception=True)
+        serializer = update_serializer.save()
+
+        retrieve_serializer = self.get_serializer(
+            serializer,
+            action='retrieve'
+        )
+        return Response(retrieve_serializer.data)
+
+# The url will be: luke/api/v1/todos/custom-action
+router.register(
+    r'todos',
+    TodoViewSet,
+    base_name="todos"
+)
+
+```

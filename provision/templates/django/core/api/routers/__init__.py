@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from itertools import ifilter
+
 from rest_framework_nested.routers import NestedSimpleRouter
 
 from .auth import AuthenticationRouter
@@ -34,7 +36,8 @@ class DefaultRouter(SimpleRouter):
             self.registry.append((prefix, viewset, base_name))
 
     def register_nested(self, parent_prefix, prefix, viewset,
-                        base_name=None, parent_lookup_name=None):
+                        base_name=None, parent_lookup_name=None,
+                        depth_level=1):
         """
         Register a nested viewset wihtout worrying of instantiate a nested
         router for registry.
@@ -46,12 +49,31 @@ class DefaultRouter(SimpleRouter):
         if parent_lookup_name is not None:
             kwargs.update(lookup=parent_lookup_name)
 
+        # Section for the depth of the route and add more routes
+
+        if depth_level > 1:
+            routers = ifilter(
+                lambda r: (r._depth_level == (depth_level - 1)) and
+                r._nested_prefix == parent_prefix,
+                self._nested_object_registry
+            )
+
+            try:
+                parent_router = routers.next()
+            except StopIteration:
+                raise RuntimeError('parent registered resource not found')
+
+        else:
+            parent_router = self
+
         nested_router = NestedSimpleRouter(
-            self,
+            parent_router,
             parent_prefix,
             **kwargs
         )
 
+        nested_router._nested_prefix = prefix
+        nested_router._depth_level = depth_level
         nested_router.register(prefix, viewset, base_name)
         self._nested_object_registry.append(nested_router)
 
