@@ -77,3 +77,273 @@ Simple scripts and templates for scaffolding a basic Django project
     ```bash
     $ git init
     ```
+
+
+## Usage API
+
+* To create serializers from luke mixins.
+```python
+# -*- coding: utf-8 -*-
+# luke/application/serializers.py
+
+from rest_framework import serializers
+
+from luke.application.models import Todo
+
+from luke.core.api.serializers import ModelSerializer
+
+
+class TodoSerializer(ModelSerializer):
+
+    #
+    # If your model have a wrong name and you want to change it, only use the
+    # property 'source' with the wrong field, after, you put the nice name into
+    # fields of your serializer.
+    #
+    nice_name = serializers.BooleanField(
+        source='wrong_name'
+    )
+
+    #
+    # If you need add a field in your serializer but it is not in your model,
+    # you can use SerializerMethodField and this function will search the method
+    # name get_name_of_your_field.
+    #
+    custom_field = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Todo
+        fields = (
+            'id',
+            'name',
+            'is_active',
+            'nice_name',
+            'custom_field',
+        )
+
+    def get_custom_field(self, instance):
+        #
+        # Put your code here. 
+        #
+        return "my custom field"
+
+    #
+    # You can rewrite all functions of Django Rest Framework like validate,
+    # validate_custom_field, create, update, etc.
+    #
+    def validate(self, data):
+        if not data['is_active']:
+            serializers.ValidationError("To do is not active.")
+
+        return data
+
+    def create(self, validated_data):
+        todo = Todo(**validated_data)
+        todo.save()
+        #
+        # The actions that you want to do after of save the object.
+        #
+        
+
+```
+
+* Create a viewset based in luke mixins. With the next code you should can
+generate a full API without define the post, get, patch, retrive or delete
+functions.
+```python
+# luke/application/api.py or luke/application/viewsets.py
+# -*- coding: utf-8 -*-
+
+from luke.api.v1.routers import router
+from luke.application import serializers
+from luke.core.api import mixins, viewsets
+
+
+class TodoViewSet(
+        mixins.CreateModelMixin,  # inherit only if you will use create
+        mixins.ListModelMixin,  # inherit only if you will use get list
+        mixins.DestroyModelMixin,  # inherit only if you will use delete
+        mixins.RetrieveModelMixin,  # inherit only if you will get retrive
+        mixins.PartialUpdateModelMixin,  # inherit only if you will use patch
+        viewsets.GenericViewSet):
+
+    permission_classes = ()
+
+    #
+    # Define the general serilizer
+    #
+    serializer_class = serializers.TodoSerializer
+
+    #
+    # Define the serializer wich the app use when the API use Post method.
+    #
+    create_serializer_class = serializers.TodoSerializer
+
+    #
+    # Define the serializer wich the app use when the API use Patch method.
+    #
+    update_serializer_class = serializers.TodoSerializer
+
+    #
+    # Define the serializer wich the app use when the API use Delete method. For
+    # example, in this case we didn't define the serializer to this actions, then,
+    # the app will use the general serializer.
+    #
+    destroy_serializer_class = serializers.TodoSerializer
+
+    #
+    # Define the serializer wich the app use when the API use Get method without
+    # pk in kwargs.
+    #
+    list_serializer_class = serializers.TodoSerializer
+
+    #
+    # Define the serializer wich the app use when the API use Get method without
+    # pk in kwargs.
+    #
+    retrieve_serializer_class = serializers.TodoSerializer
+
+    #
+    # You can rewrite the normal functions like get_queryset, get_object ...
+    #
+    def get_queryset(self):
+        self.model.objects.all()
+
+
+router.register(
+    r'todos',
+    TodoViewSet,
+    base_name="todos"
+)
+
+```
+
+* If you need use documentation with swagger, then, you need rewrite the functions
+create, update, retrive, etc. And put your documentation after of functions.
+```python
+# luke/application/api.py or luke/application/viewsets.py
+# -*- coding: utf-8 -*-
+
+from luke.api.v1.routers import router
+from luke.application import serializers
+from luke.core.api import mixins, viewsets
+
+
+class TodoViewSet(
+        mixins.CreateModelMixin,
+        mixins.RetrieveModelMixin,
+        viewsets.GenericViewSet):
+
+    permission_classes = ()
+
+    #
+    # Define the general serilizer
+    #
+    serializer_class = serializers.TodoSerializer
+    create_serializer_class = serializers.TodoSerializer
+    retrieve_serializer_class = serializers.TodoSerializer
+
+    def create(self, request, *args, **kwargs):
+        """
+        Allows the session's user to add todo's.
+        ---
+        request_serializer: serializers.TodoSerializer
+        response_serializer: serializers.TodoSerializer
+
+        responseMessages:
+            - code: 201
+              message: CREATED
+            - code: 400
+              message: BAD REQUEST
+            - code: 500
+              message: INTERNAL SERVER ERROR
+
+        consumes:
+            - application/json
+        produces:
+            - application/json
+        """
+        return super(TodoViewSet, self).create(request, *args, **kwargs)
+
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Allows the session's user get the information for certain todo.
+        ---
+        request_serializer: serializers.TodoSerializer
+        response_serializer: serializers.TodoSerializer
+
+        responseMessages:
+            - code: 200
+              message: OK
+            - code: 404
+              message: NOT FOUND
+            - code: 400
+              message: BAD REQUEST
+            - code: 500
+              message: INTERNAL SERVER ERROR
+
+        consumes:
+            - application/json
+        produces:
+            - application/json
+        """
+        return super(TodoViewSet, self).retrieve(request, *args, **kwargs)
+
+    def get_queryset(self):
+        self.model.objects.filter(is_active)
+
+
+router.register(
+    r'todos',
+    TodoViewSet,
+    base_name="todos"
+)
+
+```
+
+
+* If you need nested routes, with mixins is posible.
+```python
+# luke/application/api.py or luke/application/viewsets.py
+# -*- coding: utf-8 -*-
+
+from luke.api.v1.routers import router
+from luke.chores import serializers
+from luke.core.api import mixins, viewsets
+
+
+class ChoreViewSet(
+        mixins.ListModelMixin,
+        viewsets.NestedViewset):
+
+    permission_classes = ()
+
+    serializer_class = serializers.ChoreSerializer
+    list_serializer_class = serializers.ChoreSerializer
+
+    def list(self, request, *args, **kwargs):
+        return super(ChoreViewSet, self).list(request, *args, **kwargs)
+
+    def get_queryset(self):
+        self.model.objects.filter(
+            todo=self.kwargs['todo']  # get pk by name defined in the router
+        )
+
+#
+# The url will be: luke/api/v1/todos/pk/chores
+#
+router.register_nested(
+    r'todos',  # parent prefix
+    r'chores',  # prefix
+    ChoreViewSet,  # viewset
+    parent_lookup_name='todo',  # parent lookup name
+    base_name='chores',  # base name
+    depth_level=1  # deph level
+)
+
+#
+# You can change the deph level from 1 - n. By default is 1
+#
+
+```
