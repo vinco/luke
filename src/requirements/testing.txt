@@ -1,0 +1,5 @@
+-r base.txt
+
+# Dependencies for testing
+curdling==0.4.0
+sure==1.2.24

@@ -77,3 +77,53 @@ Simple scripts and templates for scaffolding a basic Django project
     ```bash
     $ git init
     ```
+
+
+# Testing
+
+1. Set your project's name in `tox.ini`.
+    
+    ```bash
+    # change name
+    application-import-names = myproject
+
+    DJANGO_SETTINGS_MODULE = myproject.settings.testing
+
+    norecursedirs =
+        .*
+        src/requirements
+        src/myproject/settings
+    ```
+
+1. Open vagrant environment from ssh:
+    ```bash
+    $ vagrant ssh
+    ```
+
+2. Change directory to `/vagrant`:
+    ```bash
+    $ cd /vagrant
+    ```
+
+3. Install tox inside the virtual machine:
+    ```bash
+    $ pip install tox
+    ```
+
+4. Run the proper command with tox:
+
+```
+# Run the full test suite including the PEP8 linter.
+$ tox
+
+# Run only the PEP8 linter.
+$ tox -e py27-flake8
+
+# Run only the test suite.
+$ tox -e py27-django
+
+# Pass -r flag to recreate the virtual environment when requirements changes.
+$ tox -r
+
+# Run the test suite to a specific file.
+$ tox -e py27-django src/luke/core/api/tests/test_serializers.py

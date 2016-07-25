@@ -4,23 +4,18 @@ Django development settings for ${PROJECT_NAME} project.
 """
 from . import *  # noqa
 
+# Short key for tests speed up
+SECRET_KEY = 'secret'
 
 # Debug
-DEBUG = True
+DEBUG = False
 
 TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
 
 
 # Application definition
 INSTALLED_APPS += (
-    'debug_toolbar',
 )
-
-
-MIDDLEWARE_CLASSES += (
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
-
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
@@ -33,5 +28,11 @@ DATABASES = {
 }
 
 
-# Debug toolbar
-INTERNAL_IPS = ('10.0.2.2',)
+# Simple password hasher for tests speed up
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+)
+
+
+# Email, dummy backend for tests speed up
+EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'

@@ -1,6 +1,7 @@
 # Core
 Django>=1.8,<1.9
 psycopg2>=2.6,<2.7
+pillow
 
 # Packages
 ipython
