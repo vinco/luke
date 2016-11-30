@@ -81,6 +81,7 @@ if [ ! -d  "$PROJECT_DIR" ]; then
 
     cp -r /tmp/templates/django/utils $PROJECT_DIR
     cp -r /tmp/templates/django/core $PROJECT_DIR
+    cp -r /tmp/templates/django/api $PROJECT_DIR
     chown -R vagrant:vagrant $PROJECT_DIR/..
 fi
 

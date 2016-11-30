@@ -9,6 +9,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
+import datetime
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -37,6 +38,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    # Third party apps.
+    'rest_framework_swagger',
+    'rest_framework',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -72,6 +76,62 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = '${PROJECT_NAME}.wsgi.application'
+
+# DJango-rest-framework configuration
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework.filters.DjangoFilterBackend',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'djangorestframework_camel_case.parser.CamelCaseJSONParser',
+        'rest_framework.parsers.MultiPartParser'
+    ),
+    'DEFAULT_PAGINATION_CLASS': (
+        # Your project default_pagination class project/utils/pagination.py
+        'ProjectDefaultPagination'
+    ),
+    'PAGE_SIZE': 24
+}
+
+
+# JWT_AUTH for jwt
+JWT_AUTH = {
+    'JWT_ENCODE_HANDLER': (
+        'rest_framework_jwt.utils.jwt_encode_handler'
+    ),
+    'JWT_DECODE_HANDLER': (
+        'rest_framework_jwt.utils.jwt_decode_handler'
+    ),
+    'JWT_PAYLOAD_HANDLER': (
+        'rest_framework_jwt.utils.jwt_payload_handler'
+    ),
+    'JWT_PAYLOAD_GET_USER_ID_HANDLER': (
+        'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler'
+    ),
+    'JWT_RESPONSE_PAYLOAD_HANDLER': (
+        'rest_framework_jwt.utils.jwt_response_payload_handler'
+    ),
+    'VJWT_ALGORITHM': 'HS256',
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1800),
+    'JWT_VERIFY': True,
+    'JWT_VERIFY_EXPIRATION': True,
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    'JWT_AUDIENCE': None,
+    'JWT_ISSUER': None
+}
 
 
 # Database
