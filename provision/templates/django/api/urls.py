@@ -5,7 +5,7 @@ from django.conf.urls import include, url
 
 urlpatterns = [
     url(
-        r'^v1/', include('redsep.api.v1.urls', namespace='v1')
+        r'^v1/', include('luke.api.v1.urls', namespace='v1')
     ),
 ]
 

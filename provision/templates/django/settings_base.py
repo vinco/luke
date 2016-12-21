@@ -133,6 +133,33 @@ JWT_AUTH = {
     'JWT_ISSUER': None
 }
 
+# SWAGGER_SETTINGS
+SWAGGER_SETTINGS = {
+    'exclude_namespaces': [],
+    'api_version': '1.0',
+    'api_path': '/',
+    'enabled_methods': [
+        'get',
+        'post',
+        'put',
+        'patch',
+        'delete'
+    ],
+    'api_key': '',
+    'is_authenticated': False,
+    'is_superuser': False,
+    'permission_denied_handler': None,
+    'resource_access_handler': None,
+    'info': {
+        'contact': 'alberto.jimenez@vincoorbis.com',
+        'description': '',
+        'license': 'Apache 2.0',
+        'licenseUrl': 'http://www.apache.org/licenses/LICENSE-2.0.html',
+        'termsOfServiceUrl': 'http://helloreverb.com/terms/',
+        'title': 'Luke API REST',
+    },
+    'doc_expansion': 'none',
+}
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
@@ -157,6 +184,8 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+PRODUCTION = False
 
 
 # Static files (CSS, JavaScript, Images)

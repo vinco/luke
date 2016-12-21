@@ -9,7 +9,6 @@ class CreateModelMixin(object):
     Create a model instance.
     """
     def create(self, request, *args, **kwargs):
-        # Serializer that will be used to create the object.
         data = request.data
 
         # Pass kwargs to data
@@ -21,7 +20,7 @@ class CreateModelMixin(object):
         create_serializer = self.get_serializer(
             data=data,
             action='create'
-            )
+        )
         create_serializer.is_valid(raise_exception=True)
         created_object = self.perform_create(create_serializer)
 
@@ -52,11 +51,29 @@ class ListModelMixin(object):
     List a queryset.
     """
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
 
+        queryset = self.filter_queryset(self.get_queryset(*args, **kwargs))
         page = self.paginate_queryset(queryset)
+
         if page is not None:
             serializer = self.get_serializer(page, many=True, action='list')
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class CustomListModelMixin(object):
+    """
+    Mixin used to work with custom routes. List the result of the queryset
+    """
+    def custom_list(self, request, action='list', *args, **kwargs):
+
+        queryset = self.filter_queryset(self.get_queryset(*args, **kwargs))
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, action=action)
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
@@ -68,8 +85,20 @@ class RetrieveModelMixin(object):
     Retrieve a model instance.
     """
     def retrieve(self, request, *args, **kwargs):
+
         instance = self.get_object()
         serializer = self.get_serializer(instance, action='retrieve')
+
+        return Response(serializer.data)
+
+
+class CustomRetrieveModelMixin(object):
+    """
+    Retrieve a model instance.
+    """
+    def custom_retrieve(self, request, action='retrieve', *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, action=action)
         return Response(serializer.data)
 
 
@@ -128,7 +157,9 @@ class DestroyModelMixin(object):
     Destroy a model instance.
     """
     def destroy(self, request, *args, **kwargs):
+
         instance = self.get_object()
+
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
