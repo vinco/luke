@@ -25,3 +25,25 @@ class TimeStampedMixin(models.Model):
 
     class Meta:
         abstract = True
+
+
+class CatalogueMixin(TimeStampedMixin):
+    """
+    Abstract model that defines name, is active and extends
+    from TimeStampedMixin.
+    This model must be used as the base for catalogue models in the project.
+    """
+    name = models.CharField(
+        max_length=600,
+        verbose_name='name'
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='is active'
+    )
+
+    class Meta:
+        abstract = True
+
+    def __unicode__(self):
+        return self.name

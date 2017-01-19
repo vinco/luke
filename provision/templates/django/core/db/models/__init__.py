@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 # flake8: noqa
-from .models import TimeStampedMixin
+from .models import TimeStampedMixin, CatalogueMixin
