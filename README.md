@@ -25,7 +25,7 @@ Simple scripts and templates for scaffolding a basic Django project
     # myproject/environments.json
     {
         "vagrant": {
-            "django_settings": "myproject.settings.devel",
+            "django_settings": "myproject.settings.local",
         }
     }
     ```
@@ -66,13 +66,25 @@ Simple scripts and templates for scaffolding a basic Django project
     $ fab environment:vagrant bootstrap
     ```
 
-6. Run the development server
+6. Add the following in the file myproject/urls.py for configure django debug toolbar
+
+    ```python
+    import django.conf import settings
+
+    if settings.DEBUG:
+        import debug_toolbar
+        urlpatterns += [
+            url(r'^__debug__/', include(debug_toolbar.urls)),
+        ]
+    ```
+
+7. Run the development server
     
     ```bash
     $ fab environment:vagrant runserver
     ```
 
-7. Init your repository
+8. Init your repository
 
     ```bash
     $ git init
