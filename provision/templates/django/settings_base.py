@@ -60,7 +60,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.realpath(os.path.join(BASE_DIR, 'templates'))
+            os.path.realpath(os.path.join(BASE_DIR, '..', 'templates'))
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -99,8 +99,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser'
     ),
     'DEFAULT_PAGINATION_CLASS': (
-        # Your project default_pagination class project/utils/pagination.py
-        'ProjectDefaultPagination'
+        '${PROJECT_NAME}.utils.pagination.ProjectDefaultPagination'
     ),
     'PAGE_SIZE': 24
 }
@@ -191,7 +190,7 @@ PRODUCTION = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-STATIC_URL = '/assets/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
     os.path.realpath(os.path.join(BASE_DIR, '..', 'assets')),

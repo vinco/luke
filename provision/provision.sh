@@ -78,6 +78,7 @@ if [ ! -d  "$PROJECT_DIR" ]; then
     echo "$(envsubst < /tmp/templates/django/settings_local.py)" > $PROJECT_DIR/settings/local.py
     echo "$(envsubst < /tmp/templates/django/settings_staging.py)" > $PROJECT_DIR/settings/staging.py
     echo "$(envsubst < /tmp/templates/django/settings_testing.py)" > $PROJECT_DIR/settings/testing.py
+    echo "$(envsubst < /tmp/templates/tox/tox.ini)" > /home/vagrant/tox.ini
 
     cp -r /tmp/templates/django/utils $PROJECT_DIR
     cp -r /tmp/templates/django/core $PROJECT_DIR
