@@ -69,7 +69,7 @@ Simple scripts and templates for scaffolding a basic Django project
 6. Add the following in the file myproject/urls.py for configure django debug toolbar
 
     ```python
-    import django.conf import settings
+    from django.conf import settings
 
     if settings.DEBUG:
         import debug_toolbar
