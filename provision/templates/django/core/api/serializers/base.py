@@ -22,13 +22,10 @@ class DynamicFieldsMixin(object):
     """
     Simple mixin that allows a serializer to be initialized specifying the
     fields to be serialized.
-
     Note that if fields are not defined or is explicit assigned to an empty
     iterable or a falsy value, then the serializer will ignore this and will
     have all the fields declared at load time.
-
     Example:
-
         >>> from rest_framework import serializers
         ...
         >>> class MySerializer(DynamicFieldsMixin, serializers.Serializer):
@@ -76,20 +73,57 @@ class ModelSerializer(DynamicFieldsMixin, AbsoluteUriMixin,
     """
     lookup_field = 'pk'
     api_version = 'v1'
+    custom_lookup_fields = None
+    custom_base_name = None
     resource_uri = serializers.SerializerMethodField()
+
+    def clean_lookup_fields(self):
+        """
+        Returns a list with the properties that will be lookup by
+        get_resource_uri function
+        """
+        custom_lookup_fields = {}
+        for key, string_values in self.custom_lookup_fields.iteritems():
+            values = string_values.split('__')
+            custom_lookup_fields[key] = values
+
+        return custom_lookup_fields
 
     def get_resource_uri(self, obj):
         """
         Return the uri of the given object.
         """
+        base_name = getattr(
+            self, 'resource_view_name',
+            self.Meta.model._meta.model_name
+        )
+        if self.custom_base_name:
+            base_name = self.custom_base_name
+
         url = 'api:%s:%s-detail' % (
             self.api_version,
-            getattr(
-                self, 'resource_view_name',
-                self.Meta.model._meta.model_name
-            )
+            base_name
         )
 
-        return reverse(url, request=self.context.get('request', None), kwargs={
-            self.lookup_field: getattr(obj, self.lookup_field)
-        })
+        request = self.context.get('request')
+        kwargs = {self.lookup_field: getattr(obj, self.lookup_field)}
+
+        #
+        # Using custom kwargs if any.
+        #
+        if self.custom_lookup_fields is not None:
+            kwargs = {}
+            lookup_fields = self.clean_lookup_fields()
+
+            for key, values in lookup_fields.iteritems():
+                current_value = obj
+                for field in values:
+                    current_value = getattr(current_value, field)
+
+                kwargs[key] = current_value
+
+        return reverse(
+            url,
+            request=request,
+            kwargs=kwargs
+        )
