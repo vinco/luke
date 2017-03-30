@@ -93,6 +93,18 @@ def createdb():
 
 
 @task
+def dropdb():
+    """Restore database.
+
+    Drop database named ${PROJECT_NAME}.
+
+    Usage:
+        >>>fab environment:vagrant dropdb.
+    """
+    urun('dropdb ${PROJECT_NAME}')
+
+
+@task
 def resetdb():
     """Restore database.
 
@@ -101,7 +113,7 @@ def resetdb():
     Usage:
         >>>fab environment:vagrant resetdb.
     """
-    urun('dropdb ${PROJECT_NAME}')
+    dropdb()
     createdb()
     migrate()
 
@@ -194,8 +206,8 @@ def collectstatic():
 
 
 @task
-def runtest():
-    """Run project.
+def runtests():
+    """Run of ${PROJECT_NAME}.
 
     Starts the development server inside the Vagrant VM.
 
