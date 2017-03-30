@@ -5,7 +5,8 @@
         "site_dir": "/home/vagrant/src/",
         "django_settings": "${PROJECT_NAME}.settings.local",
         "command_prefixes": [
-            "/home/vagrant/env/bin/activate"
+            "/home/vagrant/env/bin/activate",
+            "/home/vagrant/env/nvm/nvm.sh"
         ]
     }
 }

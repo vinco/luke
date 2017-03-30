@@ -42,9 +42,13 @@ echo "$(envsubst < /tmp/templates/zsh/zprofile)" > /home/vagrant/.zprofile
 cp /tmp/templates/zsh/zshrc /home/vagrant/.zshrc
 
 
+echo "Copying fabfile, tox, environments and bower configs..."
 echo "$(envsubst < /tmp/templates/fabric/fabfile.py)" > /vagrant/fabfile.py           
 echo "$(envsubst < /tmp/templates/tox/tox.ini)" > /vagrant/tox.ini                    
 echo "$(envsubst < /tmp/templates/env/environments.json)" > /vagrant/environments.json
+
+echo "$(envsubst < /tmp/templates/bower/bower.json)" > /vagrant/bower.json
+echo "$(envsubst < /tmp/templates/bower/.bowerrc)" > /vagrant/.bowerrc
 
 
 chown vagrant:vagrant /home/vagrant/.zshrc
@@ -61,6 +65,16 @@ if [ ! -d "$VIRTUALENV_DIR" ]; then
     mkdir $VIRTUALENV_DIR
     virtualenv $VIRTUALENV_DIR
     chown -R vagrant:vagrant $VIRTUALENV_DIR
+fi
+
+
+echo "Configuring nodejs and bower with nvm..."
+NVM_DIR=/home/vagrant/env/nvm
+
+if [ ! -d "$NVM_DIR" ]; then
+    git clone https://github.com/creationix/nvm.git $NVM_DIR && cd $NVM_DIR && git checkout `git describe --abbrev=0 --tags`
+    chown -R vagrant:vagrant $NVM_DIR
+    sudo -Hu vagrant bash -c "source $NVM_DIR/nvm.sh && nvm install stable && npm install gulp bower -g"
 fi
 
 

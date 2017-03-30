@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from fabric.api import cd, env, require, run, task
 from fabric.colors import green, white
-from fabric.context_managers import contextmanager, shell_env
+from fabric.context_managers import contextmanager, prefix, shell_env
 from fabric.utils import puts
 
 from fabutils import arguments, join, options
@@ -21,6 +21,17 @@ def virtualenv():
 
     with cd(env.site_dir):
         with shell_env(DJANGO_SETTINGS_MODULE=env.django_settings):
+            yield
+
+
+@contextmanager
+def node():
+    """
+    Activates the node version in which the commands shall be run.
+    """
+
+    with cd(env.site_dir):
+        with prefix('nvm use stable'), shell_env(CI='true'):
             yield
 
 
@@ -96,6 +107,16 @@ def resetdb():
 
 
 @task
+def bower_install(*args, **kwargs):
+    """
+    Installs frontend dependencies with bower.
+    """
+    with node():
+        run(join('bower install',
+                 options(**kwargs), arguments(*args)))
+
+
+@task
 def bootstrap():
     """Builds the environment to start the project.
 
@@ -108,6 +129,7 @@ def bootstrap():
     createdb()
     migrate()
     collectstatic()
+    bower_install()
 
 
 @task
