@@ -3,7 +3,7 @@
         "user": "vagrant",
         "hosts": ["192.168.33.2"],
         "site_dir": "/home/vagrant/src/",
-        "django_settings": "luke.settings.local",
+        "django_settings": "${PROJECT_NAME}.settings.local",
         "command_prefixes": [
             "/home/vagrant/env/bin/activate"
         ]

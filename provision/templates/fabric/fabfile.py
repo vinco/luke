@@ -78,7 +78,7 @@ def createdb():
     Usage:
         >>>fab environment:vagrant createdb.
     """
-    urun('createdb luke -l en_US.UTF-8 -E UTF8 -T template0')
+    urun('createdb ${PROJECT_NAME} -l en_US.UTF-8 -E UTF8 -T template0')
 
 
 @task
@@ -90,7 +90,7 @@ def resetdb():
     Usage:
         >>>fab environment:vagrant resetdb.
     """
-    urun('dropdb luke')
+    urun('dropdb ${PROJECT_NAME}')
     createdb()
     migrate()
 
