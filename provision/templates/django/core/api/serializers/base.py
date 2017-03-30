@@ -26,6 +26,7 @@ class DynamicFieldsMixin(object):
     iterable or a falsy value, then the serializer will ignore this and will
     have all the fields declared at load time.
     Example:
+
         >>> from rest_framework import serializers
         ...
         >>> class MySerializer(DynamicFieldsMixin, serializers.Serializer):
@@ -109,7 +110,7 @@ class ModelSerializer(DynamicFieldsMixin, AbsoluteUriMixin,
         kwargs = {self.lookup_field: getattr(obj, self.lookup_field)}
 
         #
-        # Using custom kwargs if any.
+        # Using custom lookup fields if any.
         #
         if self.custom_lookup_fields is not None:
             kwargs = {}

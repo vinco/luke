@@ -100,8 +100,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': (
         '${PROJECT_NAME}.utils.pagination.ProjectDefaultPagination'
-    ),
-    'PAGE_SIZE': 24
+    )
 }
 
 

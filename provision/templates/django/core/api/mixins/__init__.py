@@ -26,7 +26,7 @@ class CreateModelMixin(object):
         create_serializer = self.get_serializer(
             data=data,
             action='create'
-            )
+        )
         create_serializer.is_valid(raise_exception=True)
         created_object = self.perform_create(create_serializer)
 

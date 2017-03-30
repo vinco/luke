@@ -214,7 +214,6 @@ def runtests():
     Usage:
         >>>fab environment:vagrant runserver.
     """
-
     with cd('/vagrant'):
         run('tox')
 
