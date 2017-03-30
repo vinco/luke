@@ -8,19 +8,7 @@ from . import *  # noqa
 # Debug
 DEBUG = True
 
-TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
-
-
-# Application definition
-INSTALLED_APPS += (
-    'debug_toolbar',
-)
-
-
-MIDDLEWARE_CLASSES += (
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
-
+TEMPLATES[0]['OPTIONS']['debug'] = DEBUG  # noqa
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases

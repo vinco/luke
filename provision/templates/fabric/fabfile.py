@@ -194,6 +194,20 @@ def collectstatic():
 
 
 @task
+def runtest():
+    """Run project.
+
+    Starts the development server inside the Vagrant VM.
+
+    Usage:
+        >>>fab environment:vagrant runserver.
+    """
+
+    with cd('/vagrant'):
+        run('tox')
+
+
+@task
 def runserver():
     """Run project.
 
