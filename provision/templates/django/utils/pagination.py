@@ -10,7 +10,7 @@ from rest_framework.pagination import (
 class ProjectDefaultPagination(PageNumberPagination):
     paginate_by = 24
     paginate_by_param = 'page_size'
-    max_paginate_by = 150
+    max_paginate_by = 1000
 
 
 class CustomPagination(LimitOffsetPagination):
