@@ -11,7 +11,7 @@ DEBUG = True
 TEMPLATES[0]['OPTIONS']['debug'] = DEBUG  # noqa
 
 # Database
-# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',

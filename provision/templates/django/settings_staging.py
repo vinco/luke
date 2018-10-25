@@ -17,11 +17,9 @@ ALLOWED_HOSTS = [
 
 # Application definition
 INSTALLED_APPS += (
-    'opbeat.contrib.django',
 )
 
 MIDDLEWARE_CLASSES += (
-    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
 )
 
 
@@ -53,10 +51,28 @@ MEDIA_URL = '/uploads/'
 
 STATIC_URL = '/static/'
 
-# Opbeat
-OPBEAT = {
-    'ORGANIZATION_ID': os.environ['OPBEAT_ORGANIZATION_ID'],
-    'APP_ID': os.environ['OPBEAT_APP_ID'],
-    'SECRET_TOKEN': os.environ['OPBEAT_SECRET_TOKEN'],
-    'INSTRUMENT_DJANGO_MIDDLEWARE': True,
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'handlers': {
+        'airbrake': {
+            'level': 'ERROR',
+            'class': 'airbrake.handlers.AirbrakeHandler',
+            'api_key': os.environ['AIRBRAKE_API_KEY'],
+            'api_url': 'http://errbit.vincolabs.com/notifier_api/v2/notices',
+            'env_name': 'development',
+        }
+    },
+    'loggers': {
+        'test': {
+            'handlers': ['airbrake'],
+            'level': 'ERROR'
+        },
+        'django.request': {
+            'handlers': ['airbrake'],
+            'propagate': True,
+            'level': 'ERROR'
+        },
+    }
 }
