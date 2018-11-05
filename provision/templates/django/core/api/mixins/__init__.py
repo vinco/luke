@@ -19,7 +19,7 @@ class CreateModelMixin(object):
             if isinstance(data, QueryDict):
                 data = {}
 
-            for key, value in kwargs['extra_data'].iteritems():
+            for key, value in kwargs['extra_data'].items():
                 data.update({key: value})
 
         # Serializer that will be used to create the object.

@@ -5,7 +5,7 @@ apt-get update
 
 echo "Installing base packages..."
 PACKAGES="build-essential zsh git vim-nox tree htop libjpeg-dev libfreetype6-dev graphviz gettext"
-PACKAGES="$PACKAGES python python-setuptools python-pip python-dev"
+PACKAGES="$PACKAGES python3 python3-setuptools python3-pip python3-dev"
 PACKAGES="$PACKAGES postgresql-9.3 postgresql-server-dev-9.3"
 PACKAGES="$PACKAGES nginx"
 
@@ -59,7 +59,7 @@ chsh -s $(which zsh) vagrant
 echo "Configuring virtualenv..."
 VIRTUALENV_DIR=/home/vagrant/env
 
-pip install virtualenv
+pip3 install virtualenv
 
 if [ ! -d "$VIRTUALENV_DIR" ]; then
     mkdir $VIRTUALENV_DIR
@@ -82,7 +82,7 @@ echo "Installing python dependencies..."
 REQUIREMENTS_FILE=/home/vagrant/src/requirements/local.txt
 
 if [ -f "$REQUIREMENTS_FILE" ]; then
-    sudo -Hu vagrant bash -c "source $VIRTUALENV_DIR/bin/activate && pip install -r $REQUIREMENTS_FILE"
+    sudo -Hu vagrant bash -c "source $VIRTUALENV_DIR/bin/activate && pip3 install -r $REQUIREMENTS_FILE"
 fi
 
 

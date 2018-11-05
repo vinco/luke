@@ -1,4 +1,4 @@
 -r base.txt
 
 # Production packages
-opbeat
+django-airbrake
