@@ -1,9 +1,0 @@
-{
-    "name": "${PROJECT_NAME}",
-    "version": "0.0.1",
-    "authors": [
-        "python <python@vincoorbis.com>"
-    ],
-    "description": "Rest api of ${PROJECT_NAME}",
-    "directory": "./assets/bower_components/"
-}
