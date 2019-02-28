@@ -3,6 +3,12 @@ echo "Installing yarn..."
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 
+
+echo "Add repository for postgresql 11"
+curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" > /etc/apt/sources.list.d/PostgreSQL.list
+
+
 echo "Updating apt repositories..."
 apt-get update
 
@@ -10,14 +16,14 @@ apt-get update
 echo "Installing base packages..."
 PACKAGES="build-essential zsh git vim-nox tree htop libjpeg-dev libfreetype6-dev graphviz gettext"
 PACKAGES="$PACKAGES python3 python3-setuptools python3-pip python3-dev"
-PACKAGES="$PACKAGES postgresql-10 postgresql-server-dev-10"
+PACKAGES="$PACKAGES postgresql-11 postgresql-server-dev-11"
 PACKAGES="$PACKAGES nginx yarn"
 
 apt-get install -y $PACKAGES
 
 
 echo "Setting up PostgreSQL server..."
-cp /tmp/templates/postgresql/pg_hba.conf /etc/postgresql/10/main/pg_hba.conf
+cp /tmp/templates/postgresql/pg_hba.conf /etc/postgresql/11/main/pg_hba.conf
 service postgresql restart
 
 USER_EXISTS=$(psql -U postgres -h localhost -tAc "SELECT 1 FROM pg_roles WHERE rolname='vagrant'" postgres)
