@@ -1,4 +1,14 @@
 #!/bin/bash
+echo "Installing yarn..."
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+
+
+echo "Add repository for postgresql 11"
+curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" > /etc/apt/sources.list.d/PostgreSQL.list
+
+
 echo "Updating apt repositories..."
 apt-get update
 
@@ -6,14 +16,14 @@ apt-get update
 echo "Installing base packages..."
 PACKAGES="build-essential zsh git vim-nox tree htop libjpeg-dev libfreetype6-dev graphviz gettext"
 PACKAGES="$PACKAGES python3 python3-setuptools python3-pip python3-dev"
-PACKAGES="$PACKAGES postgresql-9.3 postgresql-server-dev-9.3"
-PACKAGES="$PACKAGES nginx"
+PACKAGES="$PACKAGES postgresql-11 postgresql-server-dev-11"
+PACKAGES="$PACKAGES nginx yarn"
 
 apt-get install -y $PACKAGES
 
 
 echo "Setting up PostgreSQL server..."
-cp /tmp/templates/postgresql/pg_hba.conf /etc/postgresql/9.3/main/pg_hba.conf
+cp /tmp/templates/postgresql/pg_hba.conf /etc/postgresql/11/main/pg_hba.conf
 service postgresql restart
 
 USER_EXISTS=$(psql -U postgres -h localhost -tAc "SELECT 1 FROM pg_roles WHERE rolname='vagrant'" postgres)
@@ -42,13 +52,11 @@ echo "$(envsubst < /tmp/templates/zsh/zprofile)" > /home/vagrant/.zprofile
 cp /tmp/templates/zsh/zshrc /home/vagrant/.zshrc
 
 
-echo "Copying fabfile, tox, environments and bower configs..."
-echo "$(envsubst < /tmp/templates/fabric/fabfile.py)" > /vagrant/fabfile.py           
-echo "$(envsubst < /tmp/templates/tox/tox.ini)" > /vagrant/tox.ini                    
+echo "Copying fabfile, tox, environments and yarn configs..."
+echo "$(envsubst < /tmp/templates/fabric/fabfile.py)" > /vagrant/fabfile.py
+echo "$(envsubst < /tmp/templates/tox/tox.ini)" > /vagrant/tox.ini
 echo "$(envsubst < /tmp/templates/env/environments.json)" > /vagrant/environments.json
-
-echo "$(envsubst < /tmp/templates/bower/bower.json)" > /vagrant/bower.json
-echo "$(envsubst < /tmp/templates/bower/.bowerrc)" > /vagrant/.bowerrc
+echo "$(envsubst < /tmp/templates/yarn/package.json)" > /vagrant/package.json
 
 
 chown vagrant:vagrant /home/vagrant/.zshrc
@@ -68,13 +76,13 @@ if [ ! -d "$VIRTUALENV_DIR" ]; then
 fi
 
 
-echo "Configuring nodejs and bower with nvm..."
+echo "Configuring nodejs with nvm..."
 NVM_DIR=/home/vagrant/env/nvm
 
 if [ ! -d "$NVM_DIR" ]; then
     git clone https://github.com/creationix/nvm.git $NVM_DIR && cd $NVM_DIR && git checkout `git describe --abbrev=0 --tags`
     chown -R vagrant:vagrant $NVM_DIR
-    sudo -Hu vagrant bash -c "source $NVM_DIR/nvm.sh && nvm install stable && npm install gulp bower -g"
+    sudo -Hu vagrant bash -c "source $NVM_DIR/nvm.sh && nvm install stable"
 fi
 
 
@@ -105,6 +113,7 @@ if [ ! -d  "$PROJECT_DIR" ]; then
 
     echo "$(envsubst < /tmp/templates/django/api/urls.py)" > $PROJECT_DIR/api/urls.py
 
+    echo "$(envsubst < /vagrant/tox.ini)" > $PROJECT_DIR/tox.ini
     chown -R vagrant:vagrant $PROJECT_DIR/..
 fi
 

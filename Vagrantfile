@@ -12,7 +12,7 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "ubuntu/bionic64"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -41,6 +41,7 @@ Vagrant.configure(2) do |config|
   # config.vm.synced_folder "../data", "/vagrant_data"
   config.vm.synced_folder "./src", "/home/vagrant/src", :mount_options => ["dmode=755", "fmode=755"]
   config.vm.synced_folder "./media", "/home/vagrant/media", :mount_options => ["dmode=755", "fmode=755"]
+  config.vm.synced_folder "./provision/templates", "/tmp/templates", create: "true", :mount_options => ["dmode=755", "fmode=755"]
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -74,6 +75,5 @@ Vagrant.configure(2) do |config|
   #   sudo apt-get update
   #   sudo apt-get install -y apache2
   # SHELL
-  config.vm.provision "file", source: "./provision/templates", destination: "/tmp/templates"
   config.vm.provision "shell", path: "./provision/provision.sh"
 end
