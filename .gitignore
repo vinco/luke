@@ -1,3 +1,13 @@
+.cache/
+.coverage/
+.pytest_cache/
 .vagrant/
-*.pyc
 .tox
+*.lock
+*.pyc
+*.swp
+*.sql
+
+media/email/*
+src/assets/node_modules/*
+src/celerybeat-schedule
