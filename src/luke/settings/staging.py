@@ -17,7 +17,7 @@ ALLOWED_HOSTS = []
 # Application definition
 INSTALLED_APPS += (, )
 
-MIDDLEWARE_CLASSES += (, )
+MIDDLEWARE += (, )
 
 
 # Database settings
