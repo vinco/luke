@@ -3,12 +3,11 @@ Simple scripts and templates for scaffolding a basic Django project.
 
 
 ## Prerequisites
-+ [Oracle's VirtualBox](https://www.virtualbox.org/)
-+ [Vagrant](http://www.vagrantup.com/)
++ [Docker 1.13 or greater](https://www.docker.com)
++ [Docker Compose 1.8.0 or greater](https://docs.docker.com/compose/)
 + [Python](http://www.python.org/)
 + [Fabric](http://www.fabfile.org/)
 + [fabutils](https://github.com/vinco/fabutils)
-
 
 ## Install
 1. Download the repository's tarball and extract it to your project's directory
@@ -19,53 +18,46 @@ Simple scripts and templates for scaffolding a basic Django project.
     $ wget https://github.com/vinco/luke/archive/api.tar.gz -O - | tar -xz --strip 1
     ```
 
-2. Set your project's name in `evironments.json`, `fabfile.py` and `provision/provision.sh`
-    
-    ```bash
-    # myproject/provision/provision.sh
-    ...
-    # PROJECT_NAME=luke
-    PROJECT_NAME=myproject
-    ...
-    ```
-
-3. Create the virtual machine
+2. Build docker environment
 
     ```bash
-    $ vagrant up
+    $ docker-compose build
     ```
-4. Redirect the required domains to your localhost (optional)
+
+3. Init docker environment
+
+    ```bash
+    $ docker-compose up
+    ```
+
+4. Install yarn packages
 
     ```bash
     # /etc/hosts
-    192.168.33.2  http://luke.local/
+    $ docker exec -it luke bash -c "yarn install --modules-folder assets/node_modules"
     ```
 
-5. Build the environment inside the virtual machine
-    
-    ```bash
-    $ fab environment:vagrant bootstrap
-    ```
 
-6. Run the development server
-    
-    ```bash
-    $ fab environment:vagrant runserver
-    ```
+## Environments
+ENVIRONMENT | STATIC URL | SSH SERVER
+------------ | ------------- | -------------
+Local | [http://127.0.0.1](http://127.0.0.1) | docker exec -it luke bash
 
-7. Init your repository
+
+## Access to database
 
     ```bash
-    $ git init
+    $ docker exec -it luke_db bash -c "psql -U postgres"
     ```
 
 
-# Test your project
+## Test your project
 
-1. Run command.
-```bash
-    $ fab environment:vagrant runtests
-```
+    ```bash
+    docker exec -it luke bash -c "tox -r"
+    docker exec -it luke bash -c "tox"
+    ```
+
 
 ## Usage API
 
@@ -111,7 +103,7 @@ class TodoSerializer(ModelSerializer):
 
     def get_custom_field(self, instance):
         #
-        # Put your code here. 
+        # Put your code here.
         #
         return "my custom field"
 
@@ -131,7 +123,7 @@ class TodoSerializer(ModelSerializer):
         #
         # The actions that you want to do after of save the object.
         #
-        
+
 
 ```
 
@@ -354,7 +346,7 @@ class TodoViewSet(viewsets.GenericViewSet):
     # name_of_action_serializer_class.
     #
     custom_action_serializer_class = serializers.CustomSerializer
-    
+
     #
     # You can do custom your detail route. For example, you can define the HHTP
     # method, also, the permission_classes can be defined right here. Finally,
